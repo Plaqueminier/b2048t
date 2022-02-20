@@ -37,7 +37,12 @@ void Core::manageEvents()
 
         if (event.type == sf::Event::KeyReleased) {
             if (event.key.code >= 71 && event.key.code <= 74) {
-                g2048->updateCells(static_cast<ArrowDirection>(event.key.code));
+                try {
+                    g2048->updateCells(static_cast<ArrowDirection>(event.key.code));
+                } catch(int e) {
+                    std::cout << "Your maximum was " << e << std::endl;
+                    win.close();
+                }
                 updateUI();
             }
         }

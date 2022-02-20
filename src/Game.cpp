@@ -48,8 +48,11 @@ int Game::countValue(const int &val)
 	return count;
 }
 
-void Game::addRandomMinValue()
+bool Game::addRandomMinValue()
 {
+	int freeCells = countValue(0);
+	if (!freeCells)
+		return false;
 	int randomFreeCell = rand() % countValue(0);
 	std::cout << randomFreeCell << std::endl;
 	int index = 0;
@@ -57,15 +60,17 @@ void Game::addRandomMinValue()
 		for (int j = 0; j < h; j++) {
 			if (map[i][j].value == 0 && index == randomFreeCell) {
 				map[i][j].value = minValue;
-				return;
+				return true;
 			}
 			index += (map[i][j].value == 0) ? 1 : 0;
 		}
 	}
+	return false;
 }
 
-void Game::updateCells(const ArrowDirection &direction)
+std::vector<std::vector<Cell>> &Game::updateCells(const ArrowDirection &direction)
 {
+	std::vector<std::vector<Cell>> mapCopy = map;
 	switch (direction) {
 		case ArrowDirection::LEFT:
 			moveLeft();
@@ -83,16 +88,21 @@ void Game::updateCells(const ArrowDirection &direction)
 			std::cerr << "Should not happen, update with invalid direction" << std::endl;
 			break;
 	}
-	std::cout << "=====================================" << std::endl;
-	dump();
-	std::cout << "-------------------------------------" << std::endl;
 	for (int i = 0; i < w; i++) {
 		for (int j = 0; j < h; j++) {
 			map[i][j].merged = false;
 		}
 	}
-	addRandomMinValue();
-	dump();
+	if (mapCopy != map) {
+		if (!addRandomMinValue()) {
+			std::cout << "YOU LOSE !" << std::endl;
+			throw(getMax());
+		}
+		dump();
+	} else {
+		std::cout << "CANNOT MOVE THIS WAY" << std::endl;
+	}
+	return map;
 }
 
 void Game::moveLeft()
@@ -171,4 +181,15 @@ bool Game::shiftCell(std::reference_wrapper<Cell> &currentCell, const int &line,
 		return true;
 	}
 	return false;
+}
+
+int Game::getMax()
+{
+	int currentMax = 0;
+	for (int i = 0; i < w; i++) {
+		for (int j = 0; j < h; j++) {
+			currentMax = map[i][j].value > currentMax ? map[i][j].value : currentMax;
+		}
+	}
+	return currentMax;
 }

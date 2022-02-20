@@ -27,11 +27,12 @@ class Game
         void dump();
         int getCellValue(const int &);
         int countValue(const int &);
-        void addRandomMinValue();
-        void updateCells(const ArrowDirection &);
+        bool addRandomMinValue();
+        std::vector<std::vector<Cell>> &updateCells(const ArrowDirection &);
         void moveLeft();
         void moveRight();
         void moveUp();
         void moveDown();
         bool shiftCell(std::reference_wrapper<Cell> &, const int &, const int &);
+        int getMax();
 };
