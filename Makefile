@@ -5,6 +5,8 @@
 SRC	=	src/main.cpp				\
 		src/Core.cpp				\
 		src/Game.cpp				\
+		src/Cell.cpp					\
+		src/Bot.cpp					\
 		src/UICell.cpp				\
 
 OBJ	=			$(SRC:.cpp=.o)

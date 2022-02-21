@@ -1,20 +1,24 @@
 #include "Core.hpp"
+#include "Game.hpp"
+#include "Bot.hpp"
 
 Core::Core(int w, int h, const std::string &name) :
     win(sf::VideoMode(w, h), name),
-    g2048(std::make_unique<Game>(WIDTH_2048, HEIGHT_2048))
+    g2048(std::make_unique<Game>(SIZE_2048, SIZE_2048)),
+    bot(std::make_unique<Bot>(SIZE_2048, SIZE_2048))
 {
     g2048->dump();
-    view.reset(sf::FloatRect(0, 0, 200 * WIDTH_2048, 200 * HEIGHT_2048));
+    view.reset(sf::FloatRect(0, 0, 200 * SIZE_2048, 200 * SIZE_2048));
     win.setView(view);
+    bot->setMap(g2048->getMap());
     
-    for (int i = 0; i < WIDTH_2048; i++) {
-        for (int j = 0; j < HEIGHT_2048; j++) {
+    for (int i = 0; i < SIZE_2048; i++) {
+        for (int j = 0; j < SIZE_2048; j++) {
             cells.push_back(std::make_shared<UICell>(
                 sf::Vector2f(150, 150), 
                 sf::Vector2f(
-                    50 + 75 + 150 * j + j * (((200 * HEIGHT_2048 - 100) - 150 * HEIGHT_2048) / HEIGHT_2048),
-                    50 + 75 + 150 * i + i * (((200 * WIDTH_2048 - 100) - 150 * WIDTH_2048) / WIDTH_2048)
+                    50 + 75 + 150 * j + j * (((200 * SIZE_2048 - 100) - 150 * SIZE_2048) / SIZE_2048),
+                    50 + 75 + 150 * i + i * (((200 * SIZE_2048 - 100) - 150 * SIZE_2048) / SIZE_2048)
                 )
             ));
         }
@@ -36,7 +40,7 @@ void Core::manageEvents()
         }
 
         if (event.type == sf::Event::KeyReleased) {
-            if (event.key.code >= 71 && event.key.code <= 74) {
+            if (false && event.key.code >= 71 && event.key.code <= 74) {
                 try {
                     g2048->updateCells(static_cast<ArrowDirection>(event.key.code));
                 } catch(int e) {
@@ -61,11 +65,32 @@ void Core::manageEvents()
 
 void Core::loop()
 {
+    int gameNumber = 10;
+    std::vector<int> scores;
     while (win.isOpen()) {
         manageEvents();
+	    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	    try {
+            g2048->updateCells(static_cast<ArrowDirection>(bot->thinkAndPlay(g2048->getMap())));
+        } catch(int e) {
+            std::cout << "Your maximum was " << e << std::endl;
+            gameNumber -= 1;
+            scores.push_back(e);
+            if (gameNumber == 0) {
+                win.close();
+            }
+            g2048->reset();
+            bot->reset();
+            bot->setMap(g2048->getMap());
+        }
+        updateUI();
         win.clear();
         drawItems();
         win.display();
+    }
+    std::cout << "Scores : " << std::endl;
+    for (auto &e : scores) {
+        std::cout << e << " " << std::endl;
     }
 }
 

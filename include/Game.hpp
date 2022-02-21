@@ -3,6 +3,8 @@
 #include <chrono>
 #include <functional>
 
+#ifndef GAME_H
+
 struct Cell;
 
 enum ArrowDirection {
@@ -25,10 +27,12 @@ class Game
         ~Game();
 
         void dump();
+        void reset();
         int getCellValue(const int &);
         int countValue(const int &);
         bool addRandomMinValue();
         std::vector<std::vector<Cell>> &updateCells(const ArrowDirection &);
+        std::vector<std::vector<Cell>> &getMap();
         void moveLeft();
         void moveRight();
         void moveUp();
@@ -36,3 +40,5 @@ class Game
         bool shiftCell(std::reference_wrapper<Cell> &, const int &, const int &);
         int getMax();
 };
+
+#endif // !GAME_H

@@ -25,11 +25,21 @@ void Game::dump()
 	}
 }
 
+void Game::reset()
+{
+	for (int i = 0; i < w; i++) {
+		for (int j = 0; j < h; j++) {
+			map[i][j].value = 0;
+		}
+	}
+	addRandomMinValue();
+}
+
 int Game::getCellValue(const int &index)
 {
 	for (int i = 0; i < w; i++) {
 		for (int j = 0; j < h; j++) {
-			if (i * w + j == index)
+			if (i * h + j == index)
 				return map[i][j].value;
 		}
 	}
@@ -54,18 +64,24 @@ bool Game::addRandomMinValue()
 	if (!freeCells)
 		return false;
 	int randomFreeCell = rand() % countValue(0);
+	int whichValue = rand() % 10;
 	std::cout << randomFreeCell << std::endl;
 	int index = 0;
 	for (int i = 0; i < w; i++) {
 		for (int j = 0; j < h; j++) {
 			if (map[i][j].value == 0 && index == randomFreeCell) {
-				map[i][j].value = minValue;
+				map[i][j].value = whichValue > 1 ? minValue : minValue * 2;
 				return true;
 			}
 			index += (map[i][j].value == 0) ? 1 : 0;
 		}
 	}
 	return false;
+}
+
+std::vector<std::vector<Cell>> &Game::getMap()
+{
+	return map;
 }
 
 std::vector<std::vector<Cell>> &Game::updateCells(const ArrowDirection &direction)
@@ -100,6 +116,10 @@ std::vector<std::vector<Cell>> &Game::updateCells(const ArrowDirection &directio
 		}
 		dump();
 	} else {
+		if (!countValue(0)) {
+			std::cout << "YOU LOSE !" << std::endl;
+			throw(getMax());
+		}
 		std::cout << "CANNOT MOVE THIS WAY" << std::endl;
 	}
 	return map;

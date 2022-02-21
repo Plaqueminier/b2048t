@@ -2,11 +2,17 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "Game.hpp"
+#include <chrono>
+#include <thread>
 #include "UICell.hpp"
 
-#define WIDTH_2048 4
-#define HEIGHT_2048 4
+
+#ifndef CORE_H
+
+class Game;
+class Bot;
+
+#define SIZE_2048 4
 
 class Core
 {
@@ -14,6 +20,7 @@ private:
     sf::RenderWindow win;
     sf::View view;
     std::unique_ptr<Game> g2048;
+    std::unique_ptr<Bot> bot;
     std::vector<std::shared_ptr<UICell>> cells;
 
 public:
@@ -25,3 +32,5 @@ public:
     void drawItems();
     void updateUI();
 };
+
+#endif // !CORE_H
